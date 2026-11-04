@@ -45,10 +45,10 @@ runde1:[
 // Kommt automatisch, sobald alle Felder aus Runde 1 gespielt sind.
 runde2:[
   ["Finish the lyrics",
-    ["ZEILE_200_HIER_EINFÜGEN (Songzeile, die zu Ende gesungen werden soll)","Shape of You (Ed Sheeran)"],
-    ["ZEILE_400_HIER_EINFÜGEN (Songzeile, die zu Ende gesungen werden soll)","Creep (Radiohead)"],
-    ["ZEILE_600_HIER_EINFÜGEN (Songzeile, die zu Ende gesungen werden soll)","Party in the USA (Miley Cyrus)"],
-    ["ZEILE_1000_HIER_EINFÜGEN (Songzeile, die zu Ende gesungen werden soll)","La La La (Naughty Boy ft. Sam Smith)"]
+    ["Im in love with the...","Shape of You (Ed Sheeran)"],
+    ["But Im a...","Creep (Radiohead)"],
+    ["Hopped on the plane at LAX..","Am I gonna fit in? (Miley Cyrus)"],
+    ["Her Body fit right in my hands, La-La-La","It Felt Like Ooh La-La-La (Shawn Mendes ft. Camila Cabello)"]
   ],
   ["Zurück in die Schule",
     ["Was ergibt 2 × 2 + 4 × 3 + 3?","19"],
