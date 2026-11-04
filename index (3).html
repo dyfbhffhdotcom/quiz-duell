@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz Duell</title>
+<style>
+:root{--bg:#0a0f1e;--card:#12306b;--card2:#0b1d44;--line:#2a7fe0;--red:#d4143c;--blue:#1e7bff;--txt:#fff;--mut:#7d8aa8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(circle at 50% 0,#14234d,var(--bg) 60%);color:var(--txt);font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;padding:16px}
+h1{margin:0;text-align:center;font-size:clamp(28px,6vw,52px);font-style:italic;font-weight:900;letter-spacing:2px;text-shadow:0 0 18px var(--red)}
+h1 span{color:var(--red)}
+.top{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:center;max-width:1100px;margin:0 auto 14px}.top h1{grid-column:1/-1;order:-1;margin-bottom:4px}.team.off{opacity:.4}
+.team{border-radius:14px;padding:10px 14px;border:2px solid transparent;background:#0d1530;transition:.2s}
+.team.red{border-color:#5a1224}.team.blue{border-color:#12376b}.team.green{border-color:#14532d}
+.team.on.red{border-color:var(--red);box-shadow:0 0 20px var(--red)}
+.team.on.blue{border-color:var(--blue);box-shadow:0 0 20px var(--blue)}
+.team.on.green{border-color:#22c55e;box-shadow:0 0 20px #22c55e}
+.tn{font-weight:800;font-size:15px;text-transform:uppercase}.mem{font-size:12px;color:var(--mut);margin-top:6px;min-height:16px}.mem b{color:var(--txt);font-weight:600;margin-right:8px;cursor:default}.bar button.sel{border-color:var(--blue);color:#fff}.bar .meta{display:block;margin-top:8px}
+.score{font-size:34px;font-weight:900;font-style:italic}
+.neg{color:#ff6b81}
+.turn{text-align:center;max-width:1100px;margin:0 auto 12px;font-weight:800;letter-spacing:1px}
+.wrap{overflow-x:auto;max-width:1100px;margin:0 auto;padding:6px}
+.board{display:grid;grid-template-columns:repeat(6,minmax(100px,1fr));gap:10px;min-width:640px}
+.cat{background:linear-gradient(#d4143c,#8a0a26);border-radius:12px;padding:14px 4px;text-align:center;font-weight:800;font-size:13px;text-transform:uppercase;box-shadow:0 0 14px #d4143c66}
+.tile{background:linear-gradient(#17407f,var(--card2));border:1px solid var(--line);border-radius:12px;padding:20px 0;color:#fff;font-size:24px;font-weight:900;font-style:italic;cursor:pointer;box-shadow:0 0 12px #2a7fe055}
+.tile:hover{filter:brightness(1.3)}
+.tile:disabled{background:#111622;border-color:#1b2233;color:#2b3447;box-shadow:none;cursor:default;filter:none}
+.bar{text-align:center;margin-top:16px}
+.bar button{background:#0d1530;color:var(--mut);border:1px solid #223;border-radius:10px;padding:8px 16px;cursor:pointer}
+dialog{border:2px solid var(--line);border-radius:18px;background:#0b1430;color:#fff;max-width:520px;width:calc(100% - 32px);padding:24px;box-shadow:0 0 40px #2a7fe088}
+dialog::backdrop{background:#000b}
+.meta{color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:1px}
+.q{font-size:22px;font-weight:700;margin:12px 0 18px}
+#img{display:block;max-width:100%;max-height:50vh;margin:0 auto 16px;border-radius:12px;border:1px solid var(--line)}
+.a{font-size:24px;font-weight:900;color:#6cf59a;min-height:34px;margin-bottom:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row button{flex:1;padding:12px;border:0;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;color:#fff;min-width:110px}
+.ok{background:#16a34a}.no{background:#d4143c}.rev{background:var(--blue)}.skip{background:#2a3350}.buz{background:#f59e0b;color:#000!important;font-size:20px!important;padding:18px!important}#info{margin:6px 0;font-weight:700;color:#ffd166;text-transform:none;font-size:15px}
+@media(max-width:560px){.top{gap:6px}.score{font-size:24px}.tn{font-size:12px}.team{padding:8px}}
+</style></head>
+<body>
+<div class="top">
+ <div class="team red on" id="t0"><div class="tn">Team Rot</div><div class="score" id="s0">0</div><div class="mem" id="m0"></div></div>
+ <h1>QUIZ<span>⚡</span>DUELL</h1>
+ <div class="team blue" id="t1"><div class="tn">Team Blau</div><div class="score" id="s1">0</div><div class="mem" id="m1"></div></div>
+ <div class="team green" id="t2"><div class="tn">Team Grün</div><div class="score" id="s2">0</div><div class="mem" id="m2"></div></div>
+</div>
+<div class="turn" id="turn"></div>
+<div class="wrap"><div class="board" id="board"></div></div>
+<div class="bar" id="join"></div><div class="bar"><button id="reset" hidden>Neues Spiel</button> <span class="meta" id="mode"></span></div>
+
+<dialog id="dlg">
+ <div class="meta" id="meta"></div>
+ <div class="q" id="q"></div>
+ <img id="img" alt="" hidden>
+ <div class="meta" id="info"></div><div class="a" id="a"></div>
+ <div class="meta" id="msg" style="white-space:pre-line;margin-bottom:12px;color:#fff;text-transform:none;font-size:15px"></div>
+ <div class="row" id="btns"></div>
+</dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY=new URLSearchParams(location.search).get("admin")||"";
+let id;try{id=localStorage.qid||(localStorage.qid=Math.random().toString(36).slice(2,10))}catch(e){id=Math.random().toString(36).slice(2,10)}
+let S=null,built=false;
+const TN=["Team Rot","Team Blau","Team Grün"];
+const post=a=>fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({key:KEY},a))}).catch(()=>{});
+
+let boardRound=-1;
+function buildBoard(){
+  const b=$("board");b.textContent="";
+  b.style.gridTemplateColumns="repeat("+S.cats.length+",minmax(100px,1fr))";
+  S.cats.forEach(c=>{const d=document.createElement("div");d.className="cat";d.textContent=c;b.appendChild(d)});
+  S.pts.forEach((p,r)=>S.cats.forEach((c,ci)=>{const t=document.createElement("button");t.className="tile";t.id="k"+ci+"-"+r;t.textContent=p;t.onclick=()=>{if(S.admin)post({action:"open",ci,r})};b.appendChild(t)}));
+}
+function build(){
+  $("reset").onclick=()=>{if(confirm("Neues Spiel starten? (Spieler bleiben)"))post({action:"reset"})};
+  const j=$("join");
+  if(!KEY){
+    const i=document.createElement("input");i.id="nm";i.placeholder="Dein Name";i.maxLength=20;
+    try{i.value=localStorage.qname||""}catch(e){}
+    i.style.cssText="background:#0d1530;color:#fff;border:1px solid #223;border-radius:10px;padding:8px 12px;margin-right:6px";
+    j.appendChild(i);
+    TN.forEach((n,t)=>{const bt=document.createElement("button");bt.id="j"+t;bt.textContent=n+" beitreten";
+      bt.onclick=()=>{const v=i.value.trim();if(!v){i.focus();return}try{localStorage.qname=v}catch(e){}post({action:"join",id,name:v,team:t})};
+      j.appendChild(bt);j.appendChild(document.createTextNode(" "))});
+  }
+  built=true;
+}
+function render(){
+  if(!built)build();
+  if(boardRound!==S.round){buildBoard();boardRound=S.round}
+  S.cats.forEach((c,ci)=>S.pts.forEach((p,r)=>{$("k"+ci+"-"+r).disabled=S.used.includes(ci+"-"+r)}));
+  [0,1,2].forEach(i=>{
+    const s=$("s"+i);s.textContent=S.score[i];s.className="score"+(S.score[i]<0?" neg":"");
+    $("t"+i).classList.toggle("on",S.turn===i);$("t"+i).classList.toggle("off",!S.active.includes(i));
+    const m=$("m"+i);m.textContent="";
+    Object.keys(S.players).filter(k=>S.players[k].team===i).forEach(k=>{
+      const e=document.createElement("b");e.textContent=S.players[k].name;
+      if(S.admin){e.style.cursor="pointer";e.title="Entfernen";e.onclick=()=>post({action:"kick",id:k})}
+      m.appendChild(e)});
+    const bt=$("j"+i);if(bt)bt.className=(S.players[id]&&S.players[id].team===i)?"sel":"";
+  });
+  const over=S.used.length===S.cats.length*4&&S.round===S.rounds-1,rl=S.rounds>1?"RUNDE "+(S.round+1)+(S.pts[0]>=200?" · DOPPELTE PUNKTE":"")+" — ":"";
+  const mx=Math.max(...S.active.map(i=>S.score[i])),win=S.active.filter(i=>S.score[i]===mx);
+  $("turn").textContent=over?"Spiel vorbei – "+(win.length>1?"Unentschieden!":TN[win[0]]+" gewinnt! 🏆"):rl+TN[S.turn].toUpperCase()+" IST DRAN";
+  $("reset").hidden=!S.admin;
+  $("mode").textContent=S.admin?"Du bist Admin":(KEY?"Falscher Admin-Schlüssel":"Du bist Mitspieler");
+  const d=$("dlg"),c=S.cur;
+  if(!c){if(d.open)d.close();return}
+  const p=S.pts[c.r],hf=p/2,tn=TN[S.turn],on="die anderen Teams";
+  $("meta").textContent=S.cats[c.ci]+" · "+p+" Punkte · "+(c.phase==="main"?tn+" antwortet":c.phase==="steal"?"Klauen: "+on+" dürfen buzzern":"Ergebnis");
+  $("q").textContent=c.q;
+  const im=$("img");
+  if(c.img){const u=/^https?:/.test(c.img)?c.img:"/bilder/"+encodeURIComponent(c.img);if(im.getAttribute("src")!==u)im.src=u;im.hidden=false}else{im.hidden=true;im.removeAttribute("src")}
+  $("a").textContent=c.a?(c.phase==="done"?"":"(nur für dich) ")+"Antwort: "+c.a:"";
+  let info="";
+  if(c.phase==="steal")info=tn+" lag falsch (−"+hf+"). "+(c.buzz?"🔔 "+((S.players[c.buzz]||{}).name||"Jemand")+" ("+TN[c.bt]+") hat gebuzzert!":"Wer kennt die Antwort? Die anderen Teams dürfen buzzern!");
+  if(c.phase==="done")info=c.msg;
+  $("info").textContent=info;
+  const bt=$("btns");bt.textContent="";
+  const add=(k,t,f)=>{const e=document.createElement("button");e.className=k;e.textContent=t;e.onclick=f;bt.appendChild(e)};
+  const me=S.players[id];
+  if(!S.admin&&c.phase==="steal"&&!c.buzz&&me&&me.team!==S.turn)add("buz","🔔 BUZZER",()=>post({action:"buzz",id}));
+  if(S.admin){
+    if(c.phase==="main"){add("ok","Richtig +"+p,()=>post({action:"judge",ok:true}));add("no","Falsch −"+hf,()=>post({action:"judge",ok:false}))}
+    else if(c.phase==="steal"){
+      if(c.buzz){add("ok","Klau richtig +"+hf,()=>post({action:"judge",ok:true}));add("no","Klau falsch −"+hf,()=>post({action:"judge",ok:false}))}
+      else add("rev","Niemand klaut",()=>post({action:"nosteal"}));
+    }else add("rev","Weiter",()=>post({action:"next"}));
+    if(c.phase!=="done")add("skip","Abbrechen",()=>post({action:"cancel"}));
+  }
+  if(!d.open)d.showModal();
+}
+$("dlg").addEventListener("cancel",e=>e.preventDefault());
+const es=new EventSource("/events?key="+encodeURIComponent(KEY));
+es.onmessage=e=>{S=JSON.parse(e.data);render()};
+es.onerror=()=>{$("mode").textContent="Verbindung wird neu aufgebaut …"};
+</script>
+</body></html>
